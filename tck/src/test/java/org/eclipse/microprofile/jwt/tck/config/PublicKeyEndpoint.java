@@ -31,6 +31,7 @@ import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -73,8 +74,8 @@ public class PublicKeyEndpoint {
     private Optional<String> location;
 
     @Inject
-    @ConfigProperty(name = Names.VERIFIER_PUBLIC_KEY_ALGORITHM, defaultValue = "RS256")
-    private String algorithm;
+    @ConfigProperty(name = Names.VERIFIER_PUBLIC_KEY_ALGORITHM, defaultValue = "RS256,ES256")
+    private List<String> algorithm;
 
     @Inject
     @ConfigProperty(name = Names.ISSUER)
@@ -116,7 +117,7 @@ public class PublicKeyEndpoint {
 
         // Check the key exists and is a valid PEM public key
         try {
-            if ("RS256".equals(algorithm)) {
+            if (algorithm.contains("RS256")) {
                 PublicKey publicKey = SimpleTokenUtils.decodePublicKey(key.orElse("bad-key"));
                 if (publicKey instanceof RSAPublicKey) {
                     msg += " | key as PEM PASS";
@@ -124,7 +125,7 @@ public class PublicKeyEndpoint {
                 } else {
                     pass = false;
                 }
-            } else if ("ES256".equals(algorithm)) {
+            } else if (algorithm.contains("ES256")) {
                 PublicKey publicKey = SimpleTokenUtils.decodeECPublicKey(key.orElse("bad-key"));
                 if (publicKey instanceof ECPublicKey) {
                     msg += " | key as PEM PASS";
@@ -161,7 +162,7 @@ public class PublicKeyEndpoint {
             try {
                 String pemValue = SimpleTokenUtils.readResource(locationValue);
                 log.info(String.format("verifyKeyLocationAsPEMResource, locationValue=%s", pemValue));
-                if ("RS256".equals(algorithm)) {
+                if (algorithm.contains("RS256")) {
                     PublicKey publicKey = SimpleTokenUtils.decodePublicKey(pemValue);
                     if (publicKey instanceof RSAPublicKey) {
                         log.info(String.format("verifyKeyLocationAsPEMResource, publicKey=%s", publicKey));
@@ -170,7 +171,7 @@ public class PublicKeyEndpoint {
                     } else {
                         pass = false;
                     }
-                } else if ("ES256".equals(algorithm)) {
+                } else if (algorithm.contains("ES256")) {
                     PublicKey publicKey = SimpleTokenUtils.decodeECPublicKey(pemValue);
                     if (publicKey instanceof ECPublicKey) {
                         log.info(String.format("verifyKeyLocationAsPEMResource, publicKey=%s", publicKey));
@@ -360,7 +361,7 @@ public class PublicKeyEndpoint {
                 StringBuilder msgBuilder = new StringBuilder();
                 JsonObject jwk = Json.createReader(new StringReader(jwkValue)).readObject();
                 if (verifyJWK(jwk, kid, msgBuilder)) {
-                    if ("RS256".equals(algorithm)) {
+                    if (algorithm.contains("RS256")) {
                         PublicKey publicKey = SimpleTokenUtils.decodeJWKSPublicKey(jwkValue);
                         log.info(String.format("verifyKeyLocationAsJWKResource, publicKey=%s", publicKey));
                     }
@@ -452,7 +453,7 @@ public class PublicKeyEndpoint {
                 log.info(String.format("verifyKeyLocationAsJWKSUrl, locationValue=%s", jwksContents.toString()));
                 StringBuilder msgBuilder = new StringBuilder();
                 if (verifyJWKS(jwksContents.toString(), kid, msgBuilder)) {
-                    if ("RS256".equals(algorithm)) {
+                    if (algorithm.contains("RS256")) {
                         PublicKey publicKey = SimpleTokenUtils.decodeJWKSPublicKey(jwksContents.toString());
                         log.info(String.format("verifyKeyLocationAsJWKSResource, publicKey=%s", publicKey));
                     }
@@ -602,7 +603,7 @@ public class PublicKeyEndpoint {
 
         boolean pass = true;
 
-        String expectedKty = "RS256".equals(algorithm) ? "RSA" : "EC";
+        String expectedKty = algorithm.contains("RS256") ? "RSA" : "EC";
         if (!key.getJsonString("kty").getString().equals(expectedKty)) {
             msg.append("key != " + expectedKty);
             pass = false;
@@ -616,11 +617,11 @@ public class PublicKeyEndpoint {
             msg.append(String.format("kid != %s, was: %s", kid, key.getJsonString("kid").getString()));
             pass = false;
         }
-        if (!key.getJsonString("alg").getString().equals(algorithm)) {
+        if (!algorithm.contains(key.getJsonString("alg").getString())) {
             msg.append("alg != " + algorithm);
             pass = false;
         }
-        if ("RS256".equals(algorithm)) {
+        if (algorithm.contains("RS256")) {
             if (!key.getJsonString("e").getString().equals("AQAB")) {
                 msg.append("e != AQAB");
                 pass = false;
@@ -629,7 +630,7 @@ public class PublicKeyEndpoint {
                 msg.append("n != tL6HShqY5H4y56rsCo7VdhT9...");
                 pass = false;
             }
-        } else if ("ES256".equals(algorithm)) {
+        } else if (algorithm.contains("ES256")) {
             if (!key.getJsonString("crv").getString().equals("P-256")) {
                 msg.append("crv != P-256");
                 pass = false;
