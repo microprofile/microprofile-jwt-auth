@@ -14,6 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+[[release_notes_22]]
+== Release Notes for MicroProfile JWT 2.2
+
+A full list of changes delivered in the 2.2 release can be found at link:https://github.com/eclipse/microprofile-jwt-auth/milestone/13?closed=1[MicroProfile JWT 2.2 Milestone].
+
+=== Spec Changes
+
+- Support both RS256 and ES256 signature algorithms if no signature algorithm has been configured (https://github.com/microprofile/microprofile-jwt-auth/issues/340[340])
+
 [[release_notes_21]]
 == Release Notes for MicroProfile JWT 2.1
 
