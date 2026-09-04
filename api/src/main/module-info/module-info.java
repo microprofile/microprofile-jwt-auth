@@ -22,7 +22,8 @@
  * MicroProfile JWT Auth API.
  *
  * <p>
- * {@code Claims} and {@code JsonWebToken} expose {@code jakarta.json} types, {@code @Claim} is a
+ * {@code Claims} declares {@code jakarta.json.JsonObject} as the type of several standard claims
+ * ({@code address}, {@code jwk}, {@code sub_jwk}), {@code @Claim} is a
  * {@code jakarta.inject.Qualifier} with {@code @Nonbinding} members and {@code ClaimLiteral} extends
  * {@code AnnotationLiteral}, so the JSON-P, CDI and Inject modules are required transitively.
  */
