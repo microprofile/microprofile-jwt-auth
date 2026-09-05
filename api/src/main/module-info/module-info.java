@@ -20,16 +20,10 @@
 
 /**
  * MicroProfile JWT Auth API.
- *
- * <p>
- * {@code Claims} declares {@code jakarta.json.JsonObject} as the type of several standard claims
- * ({@code address}, {@code jwk}, {@code sub_jwk}), {@code @Claim} is a
- * {@code jakarta.inject.Qualifier} with {@code @Nonbinding} members and {@code ClaimLiteral} extends
- * {@code AnnotationLiteral}, so the JSON-P, CDI and Inject modules are required transitively.
  */
 module org.eclipse.microprofile.jwt {
-    requires transitive jakarta.cdi;
-    requires transitive jakarta.inject;
+    requires static transitive jakarta.cdi;
+    requires static transitive jakarta.inject;
     requires transitive jakarta.json;
 
     exports org.eclipse.microprofile.auth;
