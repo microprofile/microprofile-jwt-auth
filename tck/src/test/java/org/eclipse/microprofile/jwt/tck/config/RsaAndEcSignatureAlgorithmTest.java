@@ -69,7 +69,7 @@ public class RsaAndEcSignatureAlgorithmTest extends Arquillian {
     public static WebArchive createDeployment() throws IOException {
         URL config =
                 RsaAndEcSignatureAlgorithmTest.class.getResource("/META-INF/microprofile-config-rsa-ec.properties");
-
+        URL jwk = RsaAndEcSignatureAlgorithmTest.class.getResource("/rs256es256.jwk");
         WebArchive webArchive = ShrinkWrap
                 .create(WebArchive.class, "RsaAndEcSignatureAlgorithmTest.war")
                 .addAsManifestResource(new StringAsset(MpJwtTestVersion.MPJWT_V_2_2.name()),
@@ -77,6 +77,7 @@ public class RsaAndEcSignatureAlgorithmTest extends Arquillian {
                 .addClass(RS256OrES256Endpoint.class)
                 .addClass(TCKApplication.class)
                 .addClass(SimpleTokenUtils.class)
+                .addAsResource(jwk, "/rs256es256.jwk")
                 .addAsWebInfResource("beans.xml", "beans.xml")
                 .addAsManifestResource(config, "microprofile-config.properties");
         return webArchive;
